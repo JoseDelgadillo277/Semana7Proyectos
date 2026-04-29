@@ -20,6 +20,7 @@ Temperatura
 Humedad del suelo
 Luminosidad
 Estado del cultivo
+
 🧠 Tecnologías Utilizadas
 
 Frontend:
@@ -50,6 +51,7 @@ Control de versiones:
 
 Git
 GitHub
+
 📂 Arquitectura del Proyecto
 
 El sistema está dividido en:
@@ -76,6 +78,7 @@ Domain
 Application
 Infrastructure
 Adapters
+
 ⚙️ Instalación del Proyecto
 1️⃣ Clonar repositorio
 git clone https://github.com/JoseDelgadillo277/Semana7Proyectos.git
@@ -112,6 +115,7 @@ Ejemplo:
 
 DATABASE_URL=postgresql://usuario:password@localhost/smartgarden
 MODEL_PATH=model/model.pkl
+
 🧠 Entrenar Modelo de Inteligencia Artificial
 
 Ejecutar:
@@ -141,6 +145,7 @@ http://localhost:8000
 Documentación automática:
 
 http://localhost:8000/docs
+
 🌐 Instalación Frontend
 
 Abrir nueva terminal
@@ -160,6 +165,7 @@ npm start
 Disponible en:
 
 http://localhost:3000
+
 📊 Funcionalidades del Sistema
 
 El sistema permite:
@@ -209,13 +215,13 @@ Huerto Inteligente Escolar STEAM
 
 Proyecto desarrollado por:
 
-Jose Delgadillo
+Ñaupari Camarena Julio;  Munive Rios Antony ; Delgadillo Pantoja José ; Vera Zea Jhoanna;  Soto Escobar Giancarlo & Cuicapuza Remigio Nayely
 
 Curso:
 
-Taller de Proyectos I
+Taller de Proyectos I - Ingeniería de Sistemas e Informática
 
-Universidad
+Universidad Continental
 
 Proyecto académico basado en:
 
