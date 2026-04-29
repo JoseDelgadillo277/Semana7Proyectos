@@ -1,240 +1,70 @@
-🌱 SmartGarden – Sistema Inteligente de Monitoreo Agrícola Escolar con IA
+# Getting Started with Create React App
 
-SmartGarden es una plataforma web educativa basada en IoT + Inteligencia Artificial, diseñada para monitorear variables ambientales de un huerto escolar y generar alertas inteligentes y predicciones automáticas para mejorar el cuidado de cultivos.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-El sistema integra sensores simulados, backend con FastAPI, frontend React y modelos de Machine Learning.
+## Available Scripts
 
-📌 Descripción del Proyecto
+In the project directory, you can run:
 
-El proyecto SmartGarden permite:
+### `npm start`
 
-Monitorear variables ambientales del cultivo
-Visualizar datos en tiempo real
-Generar alertas automáticas
-Realizar predicciones con IA
-Apoyar el aprendizaje STEAM en estudiantes
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-Variables monitoreadas:
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-Temperatura
-Humedad del suelo
-Luminosidad
-Estado del cultivo
+### `npm test`
 
-🧠 Tecnologías Utilizadas
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-Frontend:
+### `npm run build`
 
-React
-JavaScript
-CSS
-Axios
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-Backend:
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-Python
-FastAPI
-Uvicorn
-SQLAlchemy
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-Machine Learning:
+### `npm run eject`
 
-Scikit-learn
-Pandas
-Joblib
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-Base de datos:
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-PostgreSQL
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-Control de versiones:
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-Git
-GitHub
+## Learn More
 
-📂 Arquitectura del Proyecto
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-El sistema está dividido en:
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-SmartGarden
-│
-├── frontend (React)
-│
-├── backend (FastAPI)
-│
-├── modelo ML
-│
-├── base de datos PostgreSQL
-│
-└── archivo .env configuración
+### Code Splitting
 
-Arquitectura aplicada:
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-Arquitectura Hexagonal (Backend)
+### Analyzing the Bundle Size
 
-Separación:
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-Domain
-Application
-Infrastructure
-Adapters
+### Making a Progressive Web App
 
-⚙️ Instalación del Proyecto
-1️⃣ Clonar repositorio
-git clone https://github.com/JoseDelgadillo277/Semana7Proyectos.git
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-Entrar al proyecto:
+### Advanced Configuration
 
-cd Semana7Proyectos
-🚀 Instalación Backend
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-Entrar a carpeta backend:
+### Deployment
 
-cd backend
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-Crear entorno virtual:
+### `npm run build` fails to minify
 
-Windows:
-
-python -m venv .venv
-
-Activar entorno virtual:
-
-.venv\Scripts\activate
-
-Instalar dependencias:
-
-pip install -r requirements.txt
-📄 Configurar archivo .env
-
-Crear archivo:
-
-.env
-
-Ejemplo:
-
-DATABASE_URL=postgresql://usuario:password@localhost/smartgarden
-MODEL_PATH=model/model.pkl
-
-🧠 Entrenar Modelo de Inteligencia Artificial
-
-Ejecutar:
-
-python train_model.py
-
-Esto generará:
-
-model.pkl
-
-El modelo permite generar predicciones del estado del cultivo.
-
-▶️ Ejecutar Backend
-
-Dentro de:
-
-backend
-
-Ejecutar:
-
-uvicorn src.main:app --reload --port 8000
-
-Servidor disponible en:
-
-http://localhost:8000
-
-Documentación automática:
-
-http://localhost:8000/docs
-
-🌐 Instalación Frontend
-
-Abrir nueva terminal
-
-Entrar:
-
-cd frontend
-
-Instalar dependencias:
-
-npm install
-
-Ejecutar aplicación:
-
-npm start
-
-Disponible en:
-
-http://localhost:3000
-
-📊 Funcionalidades del Sistema
-
-El sistema permite:
-
-✔ Registro de variables ambientales
-✔ Visualización de datos del cultivo
-✔ Generación de alertas automáticas
-✔ Predicción inteligente con Machine Learning
-✔ Dashboard interactivo
-✔ Integración backend + frontend
-✔ Arquitectura limpia (Hexagonal)
-
-🧪 Inteligencia Artificial Integrada
-
-El sistema utiliza un modelo entrenado con:
-
-Scikit-learn
-
-Capaz de:
-
-analizar variables ambientales
-detectar condiciones críticas
-generar alertas inteligentes
-apoyar decisiones de riego
-
-Ejemplo:
-
-Humedad baja → alerta crítica
-Temperatura alta → advertencia
-Luminosidad baja → recomendación
-📚 Uso Educativo
-
-Este proyecto está orientado a:
-
-Ingeniería de Software
-Ingeniería Web
-IoT aplicado a educación
-Machine Learning básico
-Arquitectura empresarial
-Arquitectura hexagonal
-
-Aplicado en contexto:
-
-Huerto Inteligente Escolar STEAM
-
-👨‍💻 Autor
-
-Proyecto desarrollado por:
-
-Ñaupari Camarena Julio;  Munive Rios Antony ; Delgadillo Pantoja José ; Vera Zea Jhoanna;  Soto Escobar Giancarlo & Cuicapuza Remigio Nayely
-
-Curso:
-
-Taller de Proyectos I - Ingeniería de Sistemas e Informática
-
-Universidad Continental
-
-Proyecto académico basado en:
-
-IoT + Inteligencia Artificial + Arquitectura Hexagonal
-
-📌 Estado del Proyecto
-
-Proyecto en desarrollo activo
-
-Incluye:
-
-✔ Backend funcional
-✔ Frontend funcional
-✔ Base de datos conectada
-✔ Modelo ML entrenado
-✔ Generación de alertas inteligentes
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
