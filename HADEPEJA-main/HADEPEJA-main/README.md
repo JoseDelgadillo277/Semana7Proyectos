@@ -209,11 +209,16 @@ Huerto Inteligente Escolar STEAM
 
 Proyecto desarrollado por:
 
-Jose Delgadillo
+Ñ𝑎𝑢𝑝𝑎𝑟𝑖 𝐶𝑎𝑚𝑎𝑟𝑒𝑛𝑎 𝐽𝑢𝑙𝑖𝑜¹
+𝑀𝑢𝑛𝑖𝑣𝑒 𝑅𝑖𝑜𝑠 𝐴𝑛𝑡𝑜𝑛𝑦²
+𝐷𝑒𝑙𝑔𝑎𝑑𝑖𝑙𝑙𝑜 𝑃𝑎𝑛𝑡𝑜𝑗𝑎 𝐽𝑜𝑠é³
+𝑉𝑒𝑟𝑎 𝑍𝑒𝑎 𝐽ℎ𝑜𝑎𝑛𝑛𝑎 𝐻𝑎𝑑𝑒⁴
+𝑆𝑜𝑡𝑜 𝐸𝑠𝑐𝑜𝑏𝑎𝑟 𝐺𝑖𝑎𝑛𝑐𝑎𝑟𝑙𝑜⁵
+𝐶𝑢𝑖𝑐𝑎𝑝𝑢𝑧𝑎 𝑅𝑒𝑚𝑖𝑔𝑖𝑜 𝑁𝑎𝑦𝑒𝑙𝑦⁶
 
-Curso:
+Universidad: Universidad Continental
 
-Taller de Proyectos I
+Curso: Taller de Proyectos I
 
 Universidad
 
