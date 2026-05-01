@@ -1,6 +1,6 @@
 # 🌱 SmartGarden – Sistema Inteligente de Monitoreo Agrícola Escolar con IA
 
-> **Proyecto educativo** – Instituto Tecnológico de Tuxtla Gutiérrez
+> **Proyecto educativo** – Universidad Continental
 
 SmartGarden es una plataforma web educativa basada en **IoT + Inteligencia Artificial**, diseñada para monitorear variables ambientales de un huerto escolar y generar alertas inteligentes y predicciones automáticas para mejorar el cuidado de cultivos.
 
@@ -339,16 +339,23 @@ Este proyecto está diseñado para:
 
 ## 📄 Licencia
 
-Este proyecto es de uso educativo – Instituto Tecnológico de Tuxtla Gutiérrez
+Este proyecto es de uso académico – Universidad Continental
 
 ---
 
-## 👨‍💻 Autor
+## 👨‍💻 Autores
 
-**José Delgado** – [@JoseDelgadillo277](https://github.com/JoseDelgadillo277)
+Proyecto desarrollado por:
 
----
+| # | Nombre | Apellido |
+|---|--------|----------|
+| 1 | Ñaupari | Camarena Julio |
+| 2 | Munive | Rios Antony |
+| 3 | Delgadillo | Pantoja José |
+| 4 | Vera | Zea Johanna Hade |
+| 5 | Soto | Escobar Giancarlo |
+| 6 | Cuicapuz | Remigio Nayely |
 
-## ⭐ ¡Dale una Estrella!
+**Universidad:** Universidad Continental
 
-Si este proyecto te fue útil, no olvides dar ⭐ en GitHub
+**Curso:** Taller de Proyectos I
