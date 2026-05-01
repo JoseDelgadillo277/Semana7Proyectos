@@ -3,31 +3,61 @@ import Topbar from '../components/common/Topbar';
 import { api } from '../api';
 
 const P_CFG = {
-  alta:  { emoji: '🚨', label: 'Urgente',    bg: '#FEF2F2', border: '#FECACA', color: '#991B1B', btn: '#EF4444' },
-  media: { emoji: '⚠️', label: 'Importante', bg: '#FEF3DC', border: '#FCD88A', color: '#92400E', btn: '#F5A623' },
-  baja:  { emoji: '💡', label: 'Sugerencia', bg: '#EFF6FF', border: '#BFDBFE', color: '#1D4ED8', btn: '#3B82F6' },
+  alta: {
+    emoji: '',
+    label: 'Urgente',
+    bg: '#FEF2F2',
+    border: '#FECACA',
+    color: '#991B1B',
+    btn: '#EF4444',
+  },
+  media: {
+    emoji: '⚠️',
+    label: 'Importante',
+    bg: '#FEF3DC',
+    border: '#FCD88A',
+    color: '#92400E',
+    btn: '#F5A623',
+  },
+  baja: {
+    emoji: '',
+    label: 'Sugerencia',
+    bg: '#EFF6FF',
+    border: '#BFDBFE',
+    color: '#1D4ED8',
+    btn: '#3B82F6',
+  },
 };
 
 export default function RecomendacionesPage() {
   const [lista, setLista] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [consejoIA, setConsejoIA] = useState('Analizando datos actuales del huerto...');
+  const [consejoIA, setConsejoIA] = useState(
+    'Analizando datos actuales del huerto...'
+  );
   const [prioridadIA, setPrioridadIA] = useState('baja');
+
+  const [prediccionHumedad, setPrediccionHumedad] = useState(null);
+  const [mensajePrediccion, setMensajePrediccion] = useState(
+    'Calculando predicción del modelo entrenado...'
+  );
 
   const cargarConsejoIA = async () => {
     try {
       const sensor = await api.getSensorActual();
 
+      const datosSensor = {
+        humedad_suelo: Number(sensor.humedad_suelo || 0),
+        temperatura: Number(sensor.temperatura || 0),
+        luz: Number(sensor.luminosidad || 0),
+        humedad_aire: Number(sensor.humedad_ambiental || 0),
+      };
+
       const response = await fetch('http://127.0.0.1:8000/api/ia/recomendar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          humedad_suelo: Number(sensor.humedad_suelo || 0),
-          temperatura: Number(sensor.temperatura || 0),
-          luz: Number(sensor.luminosidad || 0),
-          humedad_aire: Number(sensor.humedad_ambiental || 0),
-        }),
+        body: JSON.stringify(datosSensor),
       });
 
       const data = await response.json();
@@ -39,167 +69,252 @@ export default function RecomendacionesPage() {
         setConsejoIA('La IA no encontró recomendaciones críticas por ahora.');
         setPrioridadIA('baja');
       }
+
+      const responsePrediccion = await fetch(
+        'http://127.0.0.1:8000/api/ia/predecir',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datosSensor),
+        }
+      );
+
+      const dataPrediccion = await responsePrediccion.json();
+
+      if (dataPrediccion.humedad_futura_predicha !== undefined) {
+        setPrediccionHumedad(dataPrediccion.humedad_futura_predicha);
+        setMensajePrediccion(
+          dataPrediccion.mensaje || 'Predicción generada correctamente.'
+        );
+      } else {
+        setPrediccionHumedad(null);
+        setMensajePrediccion(
+          dataPrediccion.error || 'No se pudo generar la predicción.'
+        );
+      }
     } catch (error) {
-      console.error('Error al obtener recomendación IA:', error);
+      console.error('Error al obtener información IA:', error);
+
       setConsejoIA('No se pudo cargar la recomendación IA desde el backend.');
       setPrioridadIA('baja');
+
+      setPrediccionHumedad(null);
+      setMensajePrediccion(
+        'No se pudo cargar la predicción del modelo entrenado.'
+      );
     }
   };
 
   useEffect(() => {
-    api.getRecomendaciones()
-      .then(data => setLista(Array.isArray(data) ? data : []))
+    api
+      .getRecomendaciones()
+      .then((data) => setLista(Array.isArray(data) ? data : []))
       .catch(() => {})
       .finally(() => setLoading(false));
 
     cargarConsejoIA();
-    const intervalo = setInterval(cargarConsejoIA, 10000);
 
+    const intervalo = setInterval(cargarConsejoIA, 10000);
     return () => clearInterval(intervalo);
   }, []);
 
   const aplicar = async (id) => {
     try {
       const updated = await api.aplicarRecomendacion(id);
-      setLista(prev => prev.map(r => r.id === id ? updated : r));
+      setLista((prev) => prev.map((r) => (r.id === id ? updated : r)));
     } catch {}
   };
 
-  if (loading) return (
-    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-      ⏳ Cargando recomendaciones...
-    </div>
-  );
+  if (loading)
+    return (
+      <div>
+        <Topbar />
+        <div style={{ padding: '30px' }}>⏳ Cargando recomendaciones...</div>
+      </div>
+    );
 
   const cfgIA = P_CFG[prioridadIA] || P_CFG.baja;
 
   return (
-    <div style={{ flex: 1 }}>
-      <Topbar title="Consejos de la IA 🤖" subtitle="Lo que el sistema recomienda para tu huerto" emoji="🤖" />
-      <div className="page-wrapper">
+    <div>
+      <Topbar />
 
-        <div style={{
-          padding: '20px 24px', background: 'var(--green-light)',
-          border: '2px solid var(--green)', borderRadius: 'var(--radius-lg)',
-          display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28,
-        }}>
-          <span style={{ fontSize: 44 }}>🤖</span>
-          <div>
-            <div style={{ fontFamily: 'var(--font-title)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--green-dark)', marginBottom: 4 }}>
-              ¡El sistema analizó tu huerto!
-            </div>
-            <div style={{ fontSize: '0.88rem', color: 'var(--text-soft)' }}>
-              {lista.filter(r => !r.aplicada).length} sugerencias pendientes ·{' '}
-              {lista.filter(r => r.aplicada).length} aplicadas ✅
-            </div>
-          </div>
-        </div>
+      <main style={{ padding: '30px', maxWidth: '1100px', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '2rem', marginBottom: '10px' }}>
+          ¡El sistema analizó tu huerto!
+        </h1>
 
-        <div style={{
-          padding: '22px 24px',
-          background: cfgIA.bg,
-          border: `2px solid ${cfgIA.border}`,
-          borderRadius: 'var(--radius-lg)',
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 18,
-          marginBottom: 24,
-        }}>
-          <div style={{ textAlign: 'center', flexShrink: 0 }}>
-            <div style={{ fontSize: 42, lineHeight: 1, marginBottom: 6 }}>🤖</div>
-            <div style={{
-              fontSize: '0.7rem',
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '28px' }}>
+          {lista.filter((r) => !r.aplicada).length} sugerencias pendientes ·{' '}
+          {lista.filter((r) => r.aplicada).length} aplicadas ✅
+        </p>
+
+        {/* Recomendación IA en tiempo real */}
+        <section
+          style={{
+            padding: '22px',
+            borderRadius: 'var(--radius-lg)',
+            background: cfgIA.bg,
+            border: `1px solid ${cfgIA.border}`,
+            color: cfgIA.color,
+            marginBottom: '24px',
+            boxShadow: 'var(--shadow-sm)',
+          }}
+        >
+          <div
+            style={{
+              display: 'inline-block',
+              padding: '6px 12px',
+              borderRadius: '999px',
+              background: '#FFFFFF',
               fontWeight: 800,
-              color: cfgIA.color,
-              background: '#fff',
-              padding: '2px 8px',
-              borderRadius: 20,
-              border: `1px solid ${cfgIA.border}`,
-            }}>
-              {cfgIA.emoji} IA {cfgIA.label}
-            </div>
+              fontSize: '0.85rem',
+              marginBottom: '12px',
+            }}
+          >
+            {cfgIA.emoji} IA {cfgIA.label}
           </div>
 
-          <div style={{ flex: 1 }}>
-            <h3 style={{
-              fontFamily: 'var(--font-title)',
-              fontSize: '1.1rem',
-              fontWeight: 700,
-              color: cfgIA.color,
-              marginBottom: 6,
-            }}>
-              Recomendación IA en tiempo real
-            </h3>
+          <h3 style={{ margin: '0 0 10px 0' }}>
+            Recomendación IA en tiempo real
+          </h3>
 
-            <p style={{
-              fontSize: '0.9rem',
-              color: 'var(--text-soft)',
-              lineHeight: 1.6,
-              marginBottom: 10,
-            }}>
-              {consejoIA}
-            </p>
+          <p style={{ marginBottom: '12px' }}>{consejoIA}</p>
 
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: cfgIA.color }}>
-              Prioridad IA: {prioridadIA}
-            </div>
+          <p style={{ fontWeight: 700, margin: 0 }}>
+            Prioridad IA: {prioridadIA}
+          </p>
+        </section>
+
+        {/* Predicciones de IA */}
+        <section
+          style={{
+            padding: '22px',
+            borderRadius: 'var(--radius-lg)',
+            background: '#EFF6FF',
+            border: '1px solid #BFDBFE',
+            color: '#1D4ED8',
+            marginTop: '4px',
+            marginBottom: '28px',
+            boxShadow: 'var(--shadow-sm)',
+          }}
+        >
+          <div
+            style={{
+              display: 'inline-block',
+              padding: '6px 12px',
+              borderRadius: '999px',
+              background: '#FFFFFF',
+              fontWeight: 800,
+              fontSize: '0.85rem',
+              marginBottom: '12px',
+            }}
+          >
+            🤖 Modelo entrenado
           </div>
-        </div>
+
+          <h3 style={{ margin: '0 0 10px 0' }}>Predicciones de IA</h3>
+
+          {prediccionHumedad !== null ? (
+            <>
+              <p style={{ marginBottom: '8px' }}>
+                Humedad futura estimada del suelo:
+              </p>
+
+              <p style={{ fontSize: '2rem', fontWeight: 900, margin: '8px 0' }}>
+                {prediccionHumedad}%
+              </p>
+
+              <p style={{ marginBottom: '8px' }}>
+                <strong>Modelo usado:</strong> modelo_humedad.pkl
+              </p>
+
+              <p style={{ fontWeight: 700, margin: 0 }}>
+                {mensajePrediccion}
+              </p>
+            </>
+          ) : (
+            <p style={{ fontWeight: 700, margin: 0 }}>{mensajePrediccion}</p>
+          )}
+        </section>
 
         {lista.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🌿</div>
-            <p>No hay recomendaciones disponibles.</p>
+          <div
+            style={{
+              padding: '20px',
+              borderRadius: 'var(--radius-lg)',
+              background: '#F9FAFB',
+              border: '1px solid #E5E7EB',
+              color: '#374151',
+            }}
+          >
+            No hay recomendaciones disponibles.
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'grid', gap: '22px' }}>
             {lista.map((r, i) => {
               const cfg = P_CFG[r.prioridad] || P_CFG.baja;
+
               return (
-                <div key={r.id} className="animate-up" style={{
-                  animationDelay: `${i * 0.08}s`,
-                  padding: '22px 24px',
-                  background: r.aplicada ? '#F9FAFB' : cfg.bg,
-                  border: `2px solid ${r.aplicada ? '#E5E7EB' : cfg.border}`,
-                  borderRadius: 'var(--radius-lg)',
-                  display: 'flex', gap: 18, alignItems: 'flex-start',
-                  opacity: r.aplicada ? 0.7 : 1,
-                  transition: 'all 0.3s ease',
-                }}>
-                  <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                    <div style={{ fontSize: 40, lineHeight: 1, marginBottom: 6 }}>
-                      {r.aplicada ? '✅' : (r.icono || cfg.emoji)}
+                <div
+                  key={r.id || i}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: '18px',
+                    padding: '20px',
+                    borderRadius: 'var(--radius-lg)',
+                    background: r.aplicada ? '#F3F4F6' : cfg.bg,
+                    border: `1px solid ${
+                      r.aplicada ? '#E5E7EB' : cfg.border
+                    }`,
+                    color: r.aplicada ? '#6B7280' : cfg.color,
+                    boxShadow: 'var(--shadow-sm)',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: '1.8rem', marginBottom: '8px' }}>
+                      {r.aplicada ? '✅' : r.icono || cfg.emoji}
                     </div>
-                    <div style={{ fontSize: '0.7rem', fontWeight: 800, color: r.aplicada ? '#6B7280' : cfg.color, background: '#fff', padding: '2px 8px', borderRadius: 20, border: `1px solid ${r.aplicada ? '#E5E7EB' : cfg.border}` }}>
+
+                    <div
+                      style={{
+                        fontWeight: 800,
+                        fontSize: '0.85rem',
+                        marginBottom: '8px',
+                      }}
+                    >
                       {r.aplicada ? '✓ Aplicado' : `${cfg.emoji} ${cfg.label}`}
                     </div>
-                  </div>
 
-                  <div style={{ flex: 1 }}>
-                    <h3 style={{ fontFamily: 'var(--font-title)', fontSize: '1.1rem', fontWeight: 700, color: r.aplicada ? '#9CA3AF' : cfg.color, marginBottom: 6, textDecoration: r.aplicada ? 'line-through' : 'none' }}>
-                      {r.accion}
-                    </h3>
-                    <p style={{ fontSize: '0.88rem', color: 'var(--text-soft)', lineHeight: 1.6, marginBottom: 14 }}>
-                      {r.descripcion}
+                    <h3 style={{ margin: '0 0 8px 0' }}>{r.accion}</h3>
+
+                    <p style={{ margin: '0 0 8px 0' }}>{r.descripcion}</p>
+
+                    <p style={{ margin: 0, fontWeight: 700 }}>
+                      Confianza:{' '}
+                      <span style={{ marginLeft: '8px' }}>{r.confianza}%</span>
                     </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>🎯 Confianza:</span>
-                      <div style={{ flex: 1, height: 8, background: '#fff', borderRadius: 20, overflow: 'hidden', border: `1px solid ${r.aplicada ? '#E5E7EB' : cfg.border}` }}>
-                        <div style={{ height: '100%', width: `${r.confianza}%`, background: r.aplicada ? '#9CA3AF' : cfg.btn, borderRadius: 20 }} />
-                      </div>
-                      <span style={{ fontWeight: 800, color: r.aplicada ? '#9CA3AF' : cfg.color, fontSize: '0.88rem' }}>{r.confianza}%</span>
-                    </div>
                   </div>
 
-                  <button onClick={() => !r.aplicada && aplicar(r.id)} disabled={r.aplicada} style={{
-                    flexShrink: 0, padding: '10px 18px',
-                    background: r.aplicada ? '#E5E7EB' : cfg.btn,
-                    color: r.aplicada ? '#9CA3AF' : '#fff',
-                    border: 'none', borderRadius: 'var(--radius)',
-                    fontWeight: 800, fontSize: '0.85rem',
-                    cursor: r.aplicada ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.3s ease', alignSelf: 'center', whiteSpace: 'nowrap',
-                  }}>
+                  <button
+                    onClick={() => !r.aplicada && aplicar(r.id)}
+                    disabled={r.aplicada}
+                    style={{
+                      flexShrink: 0,
+                      padding: '10px 18px',
+                      background: r.aplicada ? '#E5E7EB' : cfg.btn,
+                      color: r.aplicada ? '#9CA3AF' : '#fff',
+                      border: 'none',
+                      borderRadius: 'var(--radius)',
+                      fontWeight: 800,
+                      fontSize: '0.85rem',
+                      cursor: r.aplicada ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.3s ease',
+                      alignSelf: 'center',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
                     {r.aplicada ? '✅ Listo' : '✓ Aplicar'}
                   </button>
                 </div>
@@ -208,15 +323,24 @@ export default function RecomendacionesPage() {
           </div>
         )}
 
-        {lista.length > 0 && lista.every(r => r.aplicada) && (
-          <div style={{ marginTop: 24, padding: '24px', textAlign: 'center', background: 'var(--green-light)', border: '2px solid var(--green)', borderRadius: 'var(--radius-lg)' }}>
-            <div style={{ fontSize: 48, marginBottom: 8 }}>🎉</div>
-            <div style={{ fontFamily: 'var(--font-title)', fontSize: '1.2rem', fontWeight: 700, color: 'var(--green-dark)' }}>¡Aplicaste todos los consejos!</div>
-            <div style={{ fontSize: '0.88rem', color: 'var(--text-soft)', marginTop: 4 }}>Tu huerto está recibiendo el mejor cuidado posible.</div>
+        {lista.length > 0 && lista.every((r) => r.aplicada) && (
+          <div
+            style={{
+              marginTop: '28px',
+              padding: '20px',
+              borderRadius: 'var(--radius-lg)',
+              background: '#ECFDF5',
+              border: '1px solid #A7F3D0',
+              color: '#065F46',
+              fontWeight: 700,
+            }}
+          >
+            ¡Aplicaste todos los consejos!
+            <br />
+            Tu huerto está recibiendo el mejor cuidado posible.
           </div>
         )}
-
-      </div>
+      </main>
     </div>
   );
 }
