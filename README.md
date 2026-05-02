@@ -347,14 +347,14 @@ Este proyecto es de uso académico – Universidad Continental
 
 Proyecto desarrollado por estudiantes de la **Universidad Continental**:
 
-| # | 👤 Nombres | 📧 Apellidos |
-|---|------------|--------------|
-| 1 | **Ñaupari Camarena Julio** | juliocamarena@continental.edu |
-| 2 | **Munive Rios Antony** | antonymunive@continental.edu |
-| 3 | **Delgadillo Pantoja José** | josedelgadillo@continental.edu |
-| 4 | **Vera Zea Johanna Hade** | johannavera@continental.edu |
-| 5 | **Soto Escobar Giancarlo** | gianarlosoto@continental.edu |
-| 6 | **Cuicapuz Remigio Nayely** | nayelycuicapuz@continental.edu |
+| # | 👤 Integrante |
+|---|---------------|
+| 1 | **Ñaupari Camarena Julio** |
+| 2 | **Munive Rios Antony** |
+| 3 | **Delgadillo Pantoja José** |
+| 4 | **Vera Zea Johanna Hade** |
+| 5 | **Soto Escobar Giancarlo** |
+| 6 | **Cuicapuz Remigio Nayely** |
 
 ---
 
