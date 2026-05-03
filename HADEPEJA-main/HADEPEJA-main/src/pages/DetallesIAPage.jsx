@@ -257,7 +257,7 @@ export default function DetallesIAPage() {
     },
     {
       titulo: 'Luminosidad',
-      valor: `${Math.round(numero(sensor.luminosidad))}`,
+      valor: `${Math.round(numero(sensor.luminosidad))} lux`,
       detalle: estadoLuz,
       fondo: '#F0FDF4',
       borde: '#BBF7D0',
@@ -534,7 +534,7 @@ export default function DetallesIAPage() {
                   <Area
                     type="monotone"
                     dataKey="luz"
-                    name="Luminosidad"
+                    name="Luminosidad (lux)"
                     stroke="#22C55E"
                     fill="url(#luzIA)"
                     strokeWidth={3}
