@@ -14,6 +14,7 @@ El sistema permite:
 - ✅ Visualizar datos históricos y actuales
 - ✅ Generar alertas automáticas basadas en umbrales críticos
 - ✅ Realizar predicciones con Machine Learning
+- ✅ Mostrar predicciones de IA en la página DetallesIAPage
 - ✅ Apoyar el aprendizaje **STEAM** en estudiantes
 
 ### Variables Monitoreadas
