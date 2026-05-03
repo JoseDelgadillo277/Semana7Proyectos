@@ -16,6 +16,7 @@ El proyecto SmartGarden permite:
 - ✅ Visualizar datos en tiempo real
 - ✅ Generar alertas automáticas
 - ✅ Realizar predicciones con IA
+- ✅ Mostrar predicciones de IA en la página DetallesIAPage
 - ✅ Apoyar el aprendizaje STEAM en estudiantes
 
 ### Variables Monitoreadas
@@ -201,6 +202,7 @@ El sistema permite:
 - ✔ Visualización de datos del cultivo
 - ✔ Generación de alertas automáticas
 - ✔ Predicción inteligente con Machine Learning
+- ✔ Página DetallesIAPage con predicciones de IA en tiempo real
 - ✔ Dashboard interactivo
 - ✔ Integración backend + frontend
 - ✔ Arquitectura limpia (Hexagonal)
