@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Topbar from '../components/common/Topbar';
 import { api } from '../api';
 
@@ -30,6 +31,8 @@ const P_CFG = {
 };
 
 export default function RecomendacionesPage() {
+  const navigate = useNavigate();
+
   const [lista, setLista] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -241,7 +244,13 @@ export default function RecomendacionesPage() {
             {consejoIA}
           </p>
 
-          <p style={{ fontWeight: 700, margin: '0 0 0 52px', fontSize: '0.95rem' }}>
+          <p
+            style={{
+              fontWeight: 700,
+              margin: '0 0 0 52px',
+              fontSize: '0.95rem',
+            }}
+          >
             Prioridad IA:{' '}
             <span style={{ textTransform: 'capitalize' }}>{prioridadIA}</span>
           </p>
@@ -304,7 +313,13 @@ export default function RecomendacionesPage() {
 
           {prediccionHumedad !== null ? (
             <>
-              <p style={{ marginBottom: '8px', marginLeft: '52px', fontSize: '0.95rem' }}>
+              <p
+                style={{
+                  marginBottom: '8px',
+                  marginLeft: '52px',
+                  fontSize: '0.95rem',
+                }}
+              >
                 Humedad futura estimada del suelo:
               </p>
 
@@ -318,18 +333,94 @@ export default function RecomendacionesPage() {
                 {prediccionHumedad}%
               </p>
 
-              <p style={{ marginBottom: '8px', marginLeft: '52px', fontSize: '0.95rem' }}>
+              <p
+                style={{
+                  marginBottom: '8px',
+                  marginLeft: '52px',
+                  fontSize: '0.95rem',
+                }}
+              >
                 <strong>Modelo usado:</strong> modelo_humedad.pkl
               </p>
 
-              <p style={{ fontWeight: 700, margin: '0 0 0 52px', fontSize: '0.95rem' }}>
+              <p
+                style={{
+                  fontWeight: 700,
+                  margin: '0 0 0 52px',
+                  fontSize: '0.95rem',
+                }}
+              >
                 {mensajePrediccion}
               </p>
+
+              <button
+                onClick={() => navigate('/recomendaciones/detallesIA')}
+                style={{
+                  marginTop: '16px',
+                  marginLeft: '52px',
+                  padding: '11px 20px',
+                  background: '#2563EB',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontWeight: 900,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#1D4ED8';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#2563EB';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                Ver detalles
+              </button>
             </>
           ) : (
-            <p style={{ fontWeight: 700, margin: '0 0 0 52px', fontSize: '0.95rem' }}>
-              {mensajePrediccion}
-            </p>
+            <>
+              <p
+                style={{
+                  fontWeight: 700,
+                  margin: '0 0 0 52px',
+                  fontSize: '0.95rem',
+                }}
+              >
+                {mensajePrediccion}
+              </p>
+
+              <button
+                onClick={() => navigate('/recomendaciones/detallesIA')}
+                style={{
+                  marginTop: '16px',
+                  marginLeft: '52px',
+                  padding: '11px 20px',
+                  background: '#2563EB',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontWeight: 900,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#1D4ED8';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#2563EB';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                Ver detalles
+              </button>
+            </>
           )}
         </section>
 
@@ -473,7 +564,9 @@ export default function RecomendacionesPage() {
                       transition: 'all 0.3s ease',
                       alignSelf: 'center',
                       whiteSpace: 'nowrap',
-                      boxShadow: r.aplicada ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.1)',
+                      boxShadow: r.aplicada
+                        ? 'none'
+                        : '0 1px 2px rgba(0, 0, 0, 0.1)',
                     }}
                   >
                     {r.aplicada ? '✅ Listo' : '✓ Aplicar'}

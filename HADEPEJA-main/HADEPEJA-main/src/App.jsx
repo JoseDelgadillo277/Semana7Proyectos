@@ -6,6 +6,7 @@ import './styles/global.css';
 import LoginPage           from './pages/LoginPage';
 import DashboardPage       from './pages/DashboardPage';
 import RecomendacionesPage from './pages/RecomendacionesPage';
+import DetallesIAPage      from './pages/DetallesIAPage';
 import ExperimentosPage    from './pages/ExperimentosPage';
 import LineaTiempoPage     from './pages/LineaTiempoPage';
 import IndicadoresPage     from './pages/IndicadoresPage';
@@ -15,8 +16,10 @@ import AdminConfigPage     from './pages/AdminConfigPage';
 
 function PrivateRoute({ children, roles }) {
   const { user } = useAuth();
+
   if (!user) return <Navigate to="/login" replace />;
   if (roles && !roles.includes(user.rol)) return <Navigate to="/dashboard" replace />;
+
   return children;
 }
 
@@ -31,20 +34,117 @@ function Layout({ children }) {
 
 function AppRoutes() {
   const { user } = useAuth();
+
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+      <Route
+        path="/login"
+        element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+      />
 
-      <Route path="/dashboard"       element={<PrivateRoute><Layout><DashboardPage /></Layout></PrivateRoute>} />
-      <Route path="/recomendaciones" element={<PrivateRoute><Layout><RecomendacionesPage /></Layout></PrivateRoute>} />
-      <Route path="/experimentos"    element={<PrivateRoute><Layout><ExperimentosPage /></Layout></PrivateRoute>} />
-      <Route path="/linea-tiempo"    element={<PrivateRoute><Layout><LineaTiempoPage /></Layout></PrivateRoute>} />
-      <Route path="/niveles"         element={<PrivateRoute><Layout><NivelesPage /></Layout></PrivateRoute>} />
-      <Route path="/indicadores"     element={<PrivateRoute roles={['docente','admin']}><Layout><IndicadoresPage /></Layout></PrivateRoute>} />
-      <Route path="/admin/usuarios"  element={<PrivateRoute roles={['admin']}><Layout><AdminUsuariosPage /></Layout></PrivateRoute>} />
-      <Route path="/admin/config"    element={<PrivateRoute roles={['admin']}><Layout><AdminConfigPage /></Layout></PrivateRoute>} />
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <DashboardPage />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
 
-      <Route path="*" element={<Navigate to={user ? '/dashboard' : '/login'} replace />} />
+      <Route
+        path="/recomendaciones"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <RecomendacionesPage />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/recomendaciones/detallesIA"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <DetallesIAPage />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/experimentos"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <ExperimentosPage />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/linea-tiempo"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <LineaTiempoPage />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/niveles"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <NivelesPage />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/indicadores"
+        element={
+          <PrivateRoute roles={['docente', 'admin']}>
+            <Layout>
+              <IndicadoresPage />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/admin/usuarios"
+        element={
+          <PrivateRoute roles={['admin']}>
+            <Layout>
+              <AdminUsuariosPage />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/admin/config"
+        element={
+          <PrivateRoute roles={['admin']}>
+            <Layout>
+              <AdminConfigPage />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="*"
+        element={<Navigate to={user ? '/dashboard' : '/login'} replace />}
+      />
     </Routes>
   );
 }
