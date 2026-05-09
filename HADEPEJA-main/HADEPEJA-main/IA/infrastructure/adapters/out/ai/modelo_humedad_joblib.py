@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import joblib
+import pandas as pd
 
 from IA.domain.entities.datos_huerto import DatosHuerto
 from IA.domain.ports.modelo_humedad_port import ModeloHumedadPort
@@ -15,6 +16,12 @@ class ModeloHumedadJoblib(ModeloHumedadPort):
             raise FileNotFoundError("Modelo no entrenado. Ejecuta primero: python IA/entrenar_modelo.py")
 
         modelo = joblib.load(self.modelo_path)
-        entrada = [[datos.humedad_suelo, datos.temperatura, datos.luz, datos.humedad_aire]]
+        entrada = pd.DataFrame(
+            [{
+                "humedad_suelo": datos.humedad_suelo,
+                "temperatura": datos.temperatura,
+                "luz": datos.luz,
+                "humedad_aire": datos.humedad_aire,
+            }]
+        )
         return modelo.predict(entrada)[0]
-

@@ -3,9 +3,16 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import Topbar from '../components/common/Topbar';
 import MetricCard from '../components/dashboard/MetricCard';
 import { api } from '../api';
+import { evaluarSensores } from '../utils/sensorRules';
 
 const TT = {
-  contentStyle: { background: '#fff', border: '1px solid #E2EBE4', borderRadius: 12, fontSize: '0.82rem', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' },
+  contentStyle: {
+    background: '#fff',
+    border: '1px solid #E2EBE4',
+    borderRadius: 12,
+    fontSize: '0.82rem',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+  },
 };
 
 const ALERTA_CFG = {
@@ -14,7 +21,16 @@ const ALERTA_CFG = {
   info: { emoji: 'ℹ️', bg: '#EFF6FF', border: '#BFDBFE', color: '#1D4ED8' },
 };
 
-const SENSOR_VACIO = { humedad_suelo: 0, temperatura: 0, luminosidad: 0, humedad_ambiental: 0 };
+const SENSOR_VACIO = {
+  humedad_suelo: 0,
+  temperatura: 0,
+  luminosidad: 0,
+  humedad_ambiental: 0,
+};
+
+const SENSOR_UPDATE_DELAY_MS = 1000;
+
+const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function formatHora(isoStr) {
   try {
@@ -30,28 +46,17 @@ export default function DashboardPage() {
   const [alertas, setAlertas] = useState([]);
   const [ultimaAct, setUltimaAct] = useState(new Date());
   const [loading, setLoading] = useState(true);
-
-  // NUEVO: Estados para la recomendación de IA
   const [consejoIA, setConsejoIA] = useState('Cargando recomendación de IA...');
   const [prioridadIA, setPrioridadIA] = useState('baja');
 
-  // NUEVO: Función que llama al endpoint de IA
   const cargarConsejoIA = async (datosSensor) => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/ia/recomendar', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          humedad_suelo: Number(datosSensor.humedad_suelo || 0),
-          temperatura: Number(datosSensor.temperatura || 0),
-          luz: Number(datosSensor.luminosidad || 0),
-          humedad_aire: Number(datosSensor.humedad_ambiental || 0),
-        }),
+      const data = await api.recomendarIA({
+        humedad_suelo: Number(datosSensor.humedad_suelo || 0),
+        temperatura: Number(datosSensor.temperatura || 0),
+        luz: Number(datosSensor.luminosidad || 0),
+        humedad_aire: Number(datosSensor.humedad_ambiental || 0),
       });
-
-      const data = await response.json();
 
       if (data.recomendaciones && data.recomendaciones.length > 0) {
         setConsejoIA(data.recomendaciones[0]);
@@ -75,16 +80,16 @@ export default function DashboardPage() {
         api.getAlertas(),
       ]);
 
+      await esperar(SENSOR_UPDATE_DELAY_MS);
+
       if (current && !current.message) {
         setSensor(current);
         setUltimaAct(new Date());
-
-        // NUEVO: cada vez que llegan sensores actuales, se pide recomendación a la IA
         cargarConsejoIA(current);
       }
 
       if (Array.isArray(history) && history.length > 0) {
-        setHistorico(history.map(r => ({
+        setHistorico(history.map((r) => ({
           hora: formatHora(r.fecha),
           humedad: Math.round(r.humedad_suelo),
           temperatura: Math.round(r.temperatura),
@@ -94,7 +99,7 @@ export default function DashboardPage() {
 
       if (Array.isArray(alertasData)) setAlertas(alertasData);
     } catch {
-      // servidor no disponible — la UI muestra los valores vacíos
+      // Servidor no disponible: la UI mantiene los valores actuales.
     } finally {
       setLoading(false);
     }
@@ -102,19 +107,17 @@ export default function DashboardPage() {
 
   useEffect(() => {
     cargarDatos();
-    const t = setInterval(cargarDatos, 10000);
+    const t = setInterval(cargarDatos, 6000);
     return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const estadoH = sensor.humedad_suelo < 30 ? 'critico' : sensor.humedad_suelo < 50 ? 'advertencia' : 'adecuado';
-  const estadoT = sensor.temperatura > 35 ? 'critico' : sensor.temperatura > 30 ? 'advertencia' : 'adecuado';
+  const estados = evaluarSensores(sensor);
 
   return (
     <div style={{ flex: 1 }}>
       <Topbar title="¿Cómo está mi huerto?" subtitle="Datos en tiempo real de los sensores" emoji="🏠" />
       <div className="page-wrapper">
-
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
           padding: '6px 14px', background: 'var(--green-light)',
@@ -122,14 +125,14 @@ export default function DashboardPage() {
           fontSize: '0.8rem', fontWeight: 700, color: 'var(--green)', marginBottom: 20,
         }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: loading ? '#FCD88A' : 'var(--green)' }} />
-          {loading ? 'Cargando...' : `Actualizando cada 10s · ${ultimaAct.toLocaleTimeString('es-PE')}`}
+          {loading ? 'Cargando...' : `Actualizando cada 6s · ${ultimaAct.toLocaleTimeString('es-PE')}`}
         </div>
 
         <div className="metrics-grid" style={{ marginBottom: 24 }}>
-          <MetricCard icon="💧" label="Humedad del Suelo" value={Math.round(sensor.humedad_suelo)} unit="%" color="green" estado={estadoH} />
-          <MetricCard icon="🌡️" label="Temperatura" value={Math.round(sensor.temperatura)} unit="°C" color="red" estado={estadoT} />
-          <MetricCard icon="☀️" label="Luz Solar" value={Math.round(sensor.luminosidad)} unit="lux" color="yellow" estado="adecuado" />
-          <MetricCard icon="🌫️" label="Humedad del Aire" value={Math.round(sensor.humedad_ambiental)} unit="%" color="blue" estado="adecuado" />
+          <MetricCard icon="💧" label="Humedad del Suelo" value={Math.round(sensor.humedad_suelo)} unit="%" color="green" estado={estados.humedadSuelo} />
+          <MetricCard icon="🌡️" label="Temperatura" value={Math.round(sensor.temperatura)} unit="°C" color="red" estado={estados.temperatura} />
+          <MetricCard icon="☀️" label="Luz Solar" value={Math.round(sensor.luminosidad)} unit="lux" color="yellow" estado={estados.luminosidad} />
+          <MetricCard icon="🌫️" label="Humedad del Aire" value={Math.round(sensor.humedad_ambiental)} unit="%" color="blue" estado={estados.humedadAire} />
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, marginBottom: 20 }}>
@@ -171,10 +174,10 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {alertas.slice(0, 5).map(a => {
+                {alertas.slice(0, 5).map((a, index) => {
                   const cfg = ALERTA_CFG[a.tipo] || ALERTA_CFG.info;
                   return (
-                    <div key={a.id} style={{
+                    <div key={a.id || `${a.variable}-${index}`} style={{
                       padding: '12px 14px', background: cfg.bg,
                       border: `1.5px solid ${cfg.border}`,
                       borderRadius: 'var(--radius)', display: 'flex', gap: 10, alignItems: 'flex-start',
@@ -192,7 +195,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* NUEVO: Consejo conectado con la API de IA */}
         <div style={{
           padding: '18px 22px', background: 'var(--accent-light)',
           border: '2px solid #FCD88A', borderRadius: 'var(--radius-lg)',
@@ -211,7 +213,6 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

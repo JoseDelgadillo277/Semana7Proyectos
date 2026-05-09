@@ -13,6 +13,7 @@ import {
 
 import Topbar from '../components/common/Topbar';
 import { api } from '../api';
+import { etiquetaEstado, evaluarSensores } from '../utils/sensorRules';
 
 const SENSOR_VACIO = {
   humedad_suelo: 0,
@@ -20,6 +21,10 @@ const SENSOR_VACIO = {
   luminosidad: 0,
   humedad_ambiental: 0,
 };
+
+const SENSOR_UPDATE_DELAY_MS = 1000;
+
+const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const TT = {
   contentStyle: {
@@ -40,6 +45,33 @@ function limitar(valor, min, max) {
   return Math.min(Math.max(valor, min), max);
 }
 
+function estiloEstado(estado) {
+  if (estado === 'critico') {
+    return {
+      fondo: '#FEF2F2',
+      borde: '#FCA5A5',
+      color: '#991B1B',
+      sombra: '0 10px 24px rgba(153, 27, 27, 0.10)',
+    };
+  }
+
+  if (estado === 'advertencia') {
+    return {
+      fondo: '#EFF6FF',
+      borde: '#93C5FD',
+      color: '#1D4ED8',
+      sombra: '0 10px 24px rgba(29, 78, 216, 0.10)',
+    };
+  }
+
+  return {
+    fondo: '#F0FDF4',
+    borde: '#86EFAC',
+    color: '#166534',
+    sombra: '0 10px 24px rgba(22, 101, 52, 0.08)',
+  };
+}
+
 function calcularTendencia(historico, campo) {
   if (!Array.isArray(historico) || historico.length < 2) return 0;
 
@@ -53,41 +85,6 @@ function calcularTendencia(historico, campo) {
   const ultimo = numero(datosValidos[0][campo]);
 
   return (ultimo - primero) / Math.max(datosValidos.length - 1, 1);
-}
-
-function estadoHumedadSuelo(valor) {
-  if (valor < 25) return 'Crítico';
-  if (valor < 40) return 'Bajo';
-  if (valor <= 70) return 'Adecuado';
-  return 'Alto';
-}
-
-function estadoTemperatura(valor) {
-  if (valor > 35) return 'Crítico';
-  if (valor > 30) return 'Alto';
-  if (valor >= 18) return 'Adecuado';
-  return 'Bajo';
-}
-
-function estadoLuminosidad(valor) {
-  if (valor < 150) return 'Bajo';
-  if (valor <= 800) return 'Adecuado';
-  if (valor <= 1000) return 'Alto';
-  return 'Crítico';
-}
-
-function estadoHumedadAmbiental(valor) {
-  if (valor < 35) return 'Bajo';
-  if (valor <= 75) return 'Adecuado';
-  if (valor <= 90) return 'Alto';
-  return 'Crítico';
-}
-
-function colorEstado(estado) {
-  if (estado === 'Crítico') return '#991B1B';
-  if (estado === 'Alto') return '#92400E';
-  if (estado === 'Bajo') return '#1D4ED8';
-  return '#166534';
 }
 
 function generarExplicacionGrafico(datosGrafica, prediccionIA) {
@@ -138,6 +135,8 @@ export default function DetallesIAPage() {
       const sensorActual = actual && !actual.message ? actual : SENSOR_VACIO;
       const historialSensores = Array.isArray(historial) ? historial : [];
 
+      await esperar(SENSOR_UPDATE_DELAY_MS);
+
       setSensor(sensorActual);
 
       const datosIA = {
@@ -147,13 +146,7 @@ export default function DetallesIAPage() {
         humedad_aire: numero(sensorActual.humedad_ambiental),
       };
 
-      const response = await fetch('http://127.0.0.1:8000/api/ia/predecir', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosIA),
-      });
-
-      const data = await response.json();
+      const data = await api.predecirIA(datosIA);
 
       const humedadIA =
         data.humedad_futura_predicha !== undefined
@@ -229,47 +222,40 @@ export default function DetallesIAPage() {
   useEffect(() => {
     cargarDatosIA();
 
-    const intervalo = setInterval(cargarDatosIA, 10000);
+    const intervalo = setInterval(cargarDatosIA, 6000);
     return () => clearInterval(intervalo);
   }, []);
 
-  const estadoSuelo = estadoHumedadSuelo(numero(sensor.humedad_suelo));
-  const estadoTemp = estadoTemperatura(numero(sensor.temperatura));
-  const estadoLuz = estadoLuminosidad(numero(sensor.luminosidad));
-  const estadoAire = estadoHumedadAmbiental(numero(sensor.humedad_ambiental));
+  const estados = evaluarSensores(sensor);
+  const estadoSuelo = etiquetaEstado(estados.humedadSuelo);
+  const estadoTemp = etiquetaEstado(estados.temperatura);
+  const estadoLuz = etiquetaEstado(estados.luminosidad);
+  const estadoAire = etiquetaEstado(estados.humedadAire);
 
   const cards = [
     {
       titulo: 'Humedad del suelo',
       valor: `${Math.round(numero(sensor.humedad_suelo))}%`,
       detalle: estadoSuelo,
-      fondo: '#EFF6FF',
-      borde: '#BFDBFE',
-      color: '#1D4ED8',
+      ...estiloEstado(estados.humedadSuelo),
     },
     {
       titulo: 'Temperatura',
       valor: `${Math.round(numero(sensor.temperatura))}°C`,
       detalle: estadoTemp,
-      fondo: '#FEF3DC',
-      borde: '#FCD88A',
-      color: '#92400E',
+      ...estiloEstado(estados.temperatura),
     },
     {
       titulo: 'Luminosidad',
       valor: `${Math.round(numero(sensor.luminosidad))} lux`,
       detalle: estadoLuz,
-      fondo: '#F0FDF4',
-      borde: '#BBF7D0',
-      color: colorEstado(estadoLuz),
+      ...estiloEstado(estados.luminosidad),
     },
     {
       titulo: 'Humedad ambiental',
       valor: `${Math.round(numero(sensor.humedad_ambiental))}%`,
       detalle: estadoAire,
-      fondo: '#F5F3FF',
-      borde: '#DDD6FE',
-      color: '#7C3AED',
+      ...estiloEstado(estados.humedadAire),
     },
   ];
 
@@ -382,6 +368,8 @@ export default function DetallesIAPage() {
                 background: card.fondo,
                 border: `2px solid ${card.borde}`,
                 borderRadius: 'var(--radius-lg)',
+                boxShadow: card.sombra,
+                transition: 'background 0.25s ease, border-color 0.25s ease',
               }}
             >
               <div
@@ -617,7 +605,7 @@ export default function DetallesIAPage() {
               marginBottom: 8,
             }}
           >
-            ¿Como se integró la IA?
+            ¿Cómo se integró la IA?
           </h3>
 
           <p

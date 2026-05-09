@@ -3,12 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 import sys
 
-from src.infrastructure.adapters.inbound.api.routes import router as api_router
-
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+for path in (BACKEND_ROOT, PROJECT_ROOT):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
 
+from src.infrastructure.adapters.inbound.api.routes import router as api_router
 from IA.infrastructure.adapters.inbound.api.routes import router as ia_router
 
 app = FastAPI(title="Smart Garden School API")

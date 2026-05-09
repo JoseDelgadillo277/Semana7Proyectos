@@ -2,6 +2,9 @@ const BASE = 'http://localhost:8000/api';
 
 const json = (res) => res.json();
 
+const get = (url) =>
+  fetch(`${BASE}${url}`, { cache: 'no-store' }).then(json);
+
 const post = (url, body) =>
   fetch(`${BASE}${url}`, {
     method: 'POST',
@@ -27,38 +30,42 @@ export const api = {
   login: (username, password) => post('/users/login', { username, password }).then(json),
 
   // Users
-  getUsuarios:     ()           => fetch(`${BASE}/users`).then(json),
+  getUsuarios:     ()           => get('/users'),
   crearUsuario:    (data)       => post('/users', data).then(json),
   editarUsuario:   (id, data)   => put(`/users/${id}`, data).then(json),
   eliminarUsuario: (id)         => del(`/users/${id}`).then(json),
   toggleUsuario:   (id)         => patch(`/users/${id}/toggle`).then(json),
 
   // Sensores
-  getSensorActual:  ()           => fetch(`${BASE}/sensors/current`).then(json),
-  getSensorHistory: (limit = 24) => fetch(`${BASE}/sensors/history?limit=${limit}`).then(json),
+  getSensorActual:  ()           => get(`/sensors/current?t=${Date.now()}`),
+  getSensorHistory: (limit = 24) => get(`/sensors/history?limit=${limit}&t=${Date.now()}`),
   postSensorReading:(data)       => post('/sensors/reading', data).then(json),
 
   // Alertas
-  getAlertas: () => fetch(`${BASE}/alertas`).then(json),
+  getAlertas: () => get(`/alertas?t=${Date.now()}`),
 
   // Recomendaciones
-  getRecomendaciones:  ()    => fetch(`${BASE}/recomendaciones`).then(json),
+  getRecomendaciones:  ()    => get(`/recomendaciones?t=${Date.now()}`),
   aplicarRecomendacion:(id)  => patch(`/recomendaciones/${id}/aplicar`).then(json),
 
   // Experimentos
-  getExperimentos:     ()         => fetch(`${BASE}/experimentos`).then(json),
+  getExperimentos:     ()         => get('/experimentos'),
   crearExperimento:    (data)     => post('/experimentos', data).then(json),
   editarExperimento:   (id, data) => put(`/experimentos/${id}`, data).then(json),
   eliminarExperimento: (id)       => del(`/experimentos/${id}`).then(json),
 
   // Etapas de cultivo
-  getEtapas:    ()         => fetch(`${BASE}/etapas`).then(json),
+  getEtapas:    ()         => get('/etapas'),
   editarEtapa:  (id, data) => put(`/etapas/${id}`, data).then(json),
 
   // Config del sistema
-  getConfig:   ()     => fetch(`${BASE}/config`).then(json),
+  getConfig:   ()     => get('/config'),
   guardarConfig:(data) => put('/config', data).then(json),
 
   // Indicadores
-  getIndicadores: () => fetch(`${BASE}/indicadores`).then(json),
+  getIndicadores: () => get('/indicadores'),
+
+  // Inteligencia Artificial
+  recomendarIA: (data) => post('/ia/recomendar', data).then(json),
+  predecirIA:   (data) => post('/ia/predecir', data).then(json),
 };

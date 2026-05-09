@@ -4,3 +4,7 @@ pydantic
 sqlalchemy
 psycopg2-binary
 python-dotenv
+numpy
+pandas
+scikit-learn
+joblib

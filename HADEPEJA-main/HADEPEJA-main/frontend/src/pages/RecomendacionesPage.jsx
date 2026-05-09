@@ -30,6 +30,10 @@ const P_CFG = {
   },
 };
 
+const IA_UPDATE_DELAY_MS = 1000;
+
+const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default function RecomendacionesPage() {
   const navigate = useNavigate();
 
@@ -39,6 +43,7 @@ export default function RecomendacionesPage() {
   const [consejoIA, setConsejoIA] = useState(
     'Analizando datos actuales del huerto...'
   );
+  const [recomendacionesIA, setRecomendacionesIA] = useState([]);
   const [prioridadIA, setPrioridadIA] = useState('baja');
 
   const [prediccionHumedad, setPrediccionHumedad] = useState(null);
@@ -57,32 +62,20 @@ export default function RecomendacionesPage() {
         humedad_aire: Number(sensor.humedad_ambiental || 0),
       };
 
-      const response = await fetch('http://127.0.0.1:8000/api/ia/recomendar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosSensor),
-      });
+      const data = await api.recomendarIA(datosSensor);
+      const dataPrediccion = await api.predecirIA(datosSensor);
 
-      const data = await response.json();
+      await esperar(IA_UPDATE_DELAY_MS);
 
       if (data.recomendaciones && data.recomendaciones.length > 0) {
+        setRecomendacionesIA(data.recomendaciones);
         setConsejoIA(data.recomendaciones[0]);
         setPrioridadIA(data.prioridad || 'baja');
       } else {
+        setRecomendacionesIA([]);
         setConsejoIA('La IA no encontró recomendaciones críticas por ahora.');
         setPrioridadIA('baja');
       }
-
-      const responsePrediccion = await fetch(
-        'http://127.0.0.1:8000/api/ia/predecir',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(datosSensor),
-        }
-      );
-
-      const dataPrediccion = await responsePrediccion.json();
 
       if (dataPrediccion.humedad_futura_predicha !== undefined) {
         setPrediccionHumedad(dataPrediccion.humedad_futura_predicha);
@@ -98,6 +91,7 @@ export default function RecomendacionesPage() {
     } catch (error) {
       console.error('Error al obtener información IA:', error);
 
+      setRecomendacionesIA([]);
       setConsejoIA('No se pudo cargar la recomendación IA desde el backend.');
       setPrioridadIA('baja');
 
@@ -117,8 +111,19 @@ export default function RecomendacionesPage() {
 
     cargarConsejoIA();
 
-    const intervalo = setInterval(cargarConsejoIA, 10000);
-    return () => clearInterval(intervalo);
+    const refrescarAlVolver = () => {
+      if (!document.hidden) cargarConsejoIA();
+    };
+
+    const intervalo = setInterval(cargarConsejoIA, 3000);
+    window.addEventListener('focus', cargarConsejoIA);
+    document.addEventListener('visibilitychange', refrescarAlVolver);
+
+    return () => {
+      clearInterval(intervalo);
+      window.removeEventListener('focus', cargarConsejoIA);
+      document.removeEventListener('visibilitychange', refrescarAlVolver);
+    };
   }, []);
 
   const aplicar = async (id) => {
@@ -216,7 +221,7 @@ export default function RecomendacionesPage() {
               fontWeight: 700,
               fontSize: '0.9rem',
               marginBottom: '10px',
-              marginLeft: '52px',
+              marginLeft: '76px',
               border: `1.5px solid ${cfgIA.border}`,
             }}
           >
@@ -225,7 +230,7 @@ export default function RecomendacionesPage() {
 
           <h3
             style={{
-              margin: '0 0 8px 52px',
+              margin: '0 0 8px 76px',
               fontSize: '1.1rem',
               fontWeight: 800,
             }}
@@ -236,18 +241,28 @@ export default function RecomendacionesPage() {
           <p
             style={{
               marginBottom: '10px',
-              marginLeft: '52px',
+              marginLeft: '76px',
               fontSize: '1rem',
               fontWeight: 600,
             }}
           >
-            {consejoIA}
+            {recomendacionesIA.length > 0 ? (
+              <ul style={{ margin: 0, paddingLeft: 18 }}>
+                {recomendacionesIA.map((texto, index) => (
+                  <li key={`${texto}-${index}`} style={{ marginBottom: 4 }}>
+                    {texto}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              consejoIA
+            )}
           </p>
 
           <p
             style={{
               fontWeight: 700,
-              margin: '0 0 0 52px',
+              margin: '0 0 0 76px',
               fontSize: '0.95rem',
             }}
           >
@@ -294,7 +309,7 @@ export default function RecomendacionesPage() {
               fontWeight: 700,
               fontSize: '0.9rem',
               marginBottom: '10px',
-              marginLeft: '52px',
+              marginLeft: '76px',
               border: '1.5px solid #BFDBFE',
             }}
           >
@@ -303,7 +318,7 @@ export default function RecomendacionesPage() {
 
           <h3
             style={{
-              margin: '0 0 8px 52px',
+              margin: '0 0 8px 76px',
               fontSize: '1.1rem',
               fontWeight: 800,
             }}
@@ -316,7 +331,7 @@ export default function RecomendacionesPage() {
               <p
                 style={{
                   marginBottom: '8px',
-                  marginLeft: '52px',
+                  marginLeft: '76px',
                   fontSize: '0.95rem',
                 }}
               >
@@ -327,7 +342,7 @@ export default function RecomendacionesPage() {
                 style={{
                   fontSize: '1.8rem',
                   fontWeight: 900,
-                  margin: '8px 0 8px 52px',
+                  margin: '8px 0 8px 76px',
                 }}
               >
                 {prediccionHumedad}%
@@ -336,7 +351,7 @@ export default function RecomendacionesPage() {
               <p
                 style={{
                   marginBottom: '8px',
-                  marginLeft: '52px',
+                  marginLeft: '76px',
                   fontSize: '0.95rem',
                 }}
               >
@@ -346,7 +361,7 @@ export default function RecomendacionesPage() {
               <p
                 style={{
                   fontWeight: 700,
-                  margin: '0 0 0 52px',
+                  margin: '0 0 0 76px',
                   fontSize: '0.95rem',
                 }}
               >
@@ -357,7 +372,7 @@ export default function RecomendacionesPage() {
                 onClick={() => navigate('/recomendaciones/detallesIA')}
                 style={{
                   marginTop: '16px',
-                  marginLeft: '52px',
+                  marginLeft: '76px',
                   padding: '11px 20px',
                   background: '#2563EB',
                   color: '#FFFFFF',
@@ -386,7 +401,7 @@ export default function RecomendacionesPage() {
               <p
                 style={{
                   fontWeight: 700,
-                  margin: '0 0 0 52px',
+                margin: '0 0 0 76px',
                   fontSize: '0.95rem',
                 }}
               >
@@ -397,7 +412,7 @@ export default function RecomendacionesPage() {
                 onClick={() => navigate('/recomendaciones/detallesIA')}
                 style={{
                   marginTop: '16px',
-                  marginLeft: '52px',
+                  marginLeft: '76px',
                   padding: '11px 20px',
                   background: '#2563EB',
                   color: '#FFFFFF',

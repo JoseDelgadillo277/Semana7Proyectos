@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 from src.application.use_cases.sensor_use_case import SensorUseCase
+from src.application.use_cases.sensor_rules import evaluar_sensor
 from src.infrastructure.adapters.out.persistence.postgres_repository import PostgresSensorRepository
 from src.application.use_cases.user_use_case import UserUseCase
 from src.infrastructure.adapters.out.persistence.postgres_user_repository import PostgresUserRepository
@@ -154,8 +155,11 @@ async def get_history(limit: int = 24, uc: SensorUseCase = Depends(get_sensor_uc
 # ─── Alertas ──────────────────────────────────────────────────────────────────
 
 @router.get("/alertas")
-async def get_alertas(uc: AlertaUseCase = Depends(get_alerta_uc)):
-    return [a.to_dict() for a in uc.obtener_alertas()]
+async def get_alertas(sensor_uc: SensorUseCase = Depends(get_sensor_uc)):
+    reading = sensor_uc.obtener_estado_actual()
+    if not reading:
+        return []
+    return evaluar_sensor(reading)["alertas"]
 
 @router.post("/alertas")
 async def create_alerta(data: dict, uc: AlertaUseCase = Depends(get_alerta_uc)):

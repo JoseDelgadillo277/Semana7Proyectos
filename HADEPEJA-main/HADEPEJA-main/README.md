@@ -172,7 +172,7 @@ Crear archivo `.env` en la raíz del backend:
 
 ```env
 DATABASE_URL=postgresql://usuario:password@localhost/smartgarden
-MODEL_PATH=model/model.pkl
+MODEL_PATH=IA/infrastructure/models/modelo_humedad.pkl
 ```
 
 ---
@@ -180,10 +180,10 @@ MODEL_PATH=model/model.pkl
 ### 🧠 Entrenar Modelo de Inteligencia Artificial
 
 ```bash
-python train_model.py
+python IA/entrenar_modelo.py
 ```
 
-Esto generará: `model.pkl`
+Esto generará: `IA/infrastructure/models/modelo_humedad.pkl`
 
 El modelo permite generar predicciones del estado del cultivo.
 
