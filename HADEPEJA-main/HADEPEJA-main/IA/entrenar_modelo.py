@@ -3,6 +3,9 @@ import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import joblib
+from pathlib import Path
+
+MODELO_HUMEDAD_PATH = Path(__file__).resolve().parent / "infrastructure" / "models" / "modelo_humedad.pkl"
 
 # Datos simulados para entrenamiento inicial
 data = {
@@ -30,5 +33,6 @@ print("Modelo entrenado correctamente")
 print(f"MAE: {mae:.2f}")
 print(f"RMSE: {rmse:.2f}")
 
-joblib.dump(modelo, "src/ia/modelo_humedad.pkl")
-print("Modelo guardado en src/ia/modelo_humedad.pkl")
+MODELO_HUMEDAD_PATH.parent.mkdir(parents=True, exist_ok=True)
+joblib.dump(modelo, MODELO_HUMEDAD_PATH)
+print(f"Modelo guardado en {MODELO_HUMEDAD_PATH}")

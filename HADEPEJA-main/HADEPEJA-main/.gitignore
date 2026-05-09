@@ -8,12 +8,15 @@
 
 # python environments
 /backend/venv
+__pycache__/
+*.py[cod]
 
 # testing
 /coverage
 
 # production
 /build
+/frontend/build
 
 # misc
 .DS_Store
