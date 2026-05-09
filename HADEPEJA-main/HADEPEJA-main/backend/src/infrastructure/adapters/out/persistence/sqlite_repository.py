@@ -1,6 +1,6 @@
 import sqlite3
 from src.domain.entities.sensor import SensorReading
-from src.domain.ports.repository_port import SensorRepositoryPort
+from src.domain.ports.sensor_repository_port import SensorRepositoryPort
 from typing import List
 from datetime import datetime
 

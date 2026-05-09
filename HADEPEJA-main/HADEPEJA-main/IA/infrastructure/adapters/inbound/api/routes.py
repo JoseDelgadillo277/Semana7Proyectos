@@ -5,11 +5,11 @@ from pydantic import BaseModel
 
 from IA.application.use_cases.analizar_huerto_use_case import AnalizarHuertoUseCase
 from IA.domain.entities.datos_huerto import DatosHuerto
-from IA.infrastructure.adapters.modelo_humedad_joblib import ModeloHumedadJoblib
+from IA.infrastructure.adapters.out.ai.modelo_humedad_joblib import ModeloHumedadJoblib
 
 
 router = APIRouter(prefix="/api/ia", tags=["IA"])
-MODELO_HUMEDAD_PATH = Path(__file__).resolve().parents[1] / "models" / "modelo_humedad.pkl"
+MODELO_HUMEDAD_PATH = Path(__file__).resolve().parents[3] / "models" / "modelo_humedad.pkl"
 
 
 class DatosHuertoRequest(BaseModel):
@@ -43,4 +43,3 @@ def predecir(datos: DatosHuertoRequest):
         return get_use_case().predecir_humedad(datos.to_entity())
     except FileNotFoundError as exc:
         return {"error": str(exc)}
-

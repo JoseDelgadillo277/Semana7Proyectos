@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from src.domain.entities.sensor import SensorReading
-from src.domain.ports.repository_port import SensorRepositoryPort
+from src.domain.ports.sensor_repository_port import SensorRepositoryPort
 from src.infrastructure.database import SessionLocal, SensorReadingDB
 from typing import List
 

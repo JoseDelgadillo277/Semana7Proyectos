@@ -1,2 +1,1 @@
-from IA.infrastructure.api.routes import router
-
+from IA.infrastructure.adapters.inbound.api.routes import router

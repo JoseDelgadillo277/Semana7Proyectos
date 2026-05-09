@@ -65,20 +65,43 @@ El proyecto SmartGarden permite:
 
 ## 📂 Arquitectura del Proyecto
 
-El sistema está dividido en:
+El sistema está dividido en frontend, backend, IA y base de datos. El backend aplica una arquitectura hexagonal realista para el tamaño del proyecto:
 
 ```
-SmartGarden
-│
-├── frontend (React)
-│
-├── backend (FastAPI)
-│
-├── modelo ML
-│
-├── base de datos PostgreSQL
-│
-└── archivo .env configuración
+HADEPEJA/
+|-- backend/
+|   |-- src/
+|   |   |-- domain/
+|   |   |   |-- entities/
+|   |   |   `-- ports/
+|   |   |       |-- alerta_port.py
+|   |   |       |-- etapa_port.py
+|   |   |       |-- experimento_port.py
+|   |   |       |-- recomendacion_port.py
+|   |   |       |-- sensor_repository_port.py
+|   |   |       `-- user_repository_port.py
+|   |   |-- application/
+|   |   |   `-- use_cases/
+|   |   |-- infrastructure/
+|   |   |   |-- adapters/
+|   |   |   |   |-- inbound/
+|   |   |   |   |   `-- api/routes.py
+|   |   |   |   `-- out/
+|   |   |   |       `-- persistence/
+|   |   |   `-- database/database.py
+|   |   `-- main.py
+|-- frontend/
+|   `-- src/
+`-- IA/
+    |-- application/
+    |-- domain/
+    |-- entrenar_modelo.py
+    |-- motor_ia.py
+    `-- infrastructure/
+        |-- adapters/
+        |   |-- inbound/api/routes.py
+        |   `-- out/ai/modelo_humedad_joblib.py
+        `-- models/modelo_humedad.pkl
 ```
 
 ### Arquitectura Aplicada
@@ -89,8 +112,18 @@ Separación:
 
 - **Domain** – Entidades y reglas de negocio
 - **Application** – Casos de uso
-- **Infrastructure** – Implementaciones y base de datos
-- **Adapters** – Puertos de comunicación
+- **Infrastructure** – Implementaciones externas y base de datos
+- **Adapters inbound** – Entrada HTTP/FastAPI
+- **Adapters outbound** – Persistencia PostgreSQL/SQLite
+
+Mejoras aplicadas según retroalimentación:
+
+- Se movió `routes.py` a `infrastructure/adapters/inbound/api/`.
+- Se separaron repositorios en `infrastructure/adapters/out/persistence/`.
+- Se ordenó la API de IA como adapter inbound y el modelo Joblib como adapter outbound.
+- Se renombró el puerto genérico de sensores a `sensor_repository_port.py`.
+- Se mantiene una sola carpeta de IA (`IA/`) para evitar duplicación.
+- Se mantiene el frontend React simple, sin complejidad enterprise innecesaria.
 
 ---
 

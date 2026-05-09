@@ -1,4 +1,4 @@
-from src.domain.ports.repository_port import SensorRepositoryPort
+from src.domain.ports.sensor_repository_port import SensorRepositoryPort
 from src.domain.entities.sensor import SensorReading
 
 class SensorUseCase:

@@ -3,17 +3,17 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 from src.application.use_cases.sensor_use_case import SensorUseCase
-from src.infrastructure.adapters.postgres_repository import PostgresSensorRepository
+from src.infrastructure.adapters.out.persistence.postgres_repository import PostgresSensorRepository
 from src.application.use_cases.user_use_case import UserUseCase
-from src.infrastructure.adapters.postgres_user_repository import PostgresUserRepository
+from src.infrastructure.adapters.out.persistence.postgres_user_repository import PostgresUserRepository
 from src.application.use_cases.alerta_use_case import AlertaUseCase
-from src.infrastructure.adapters.postgres_alerta_repository import PostgresAlertaRepository
+from src.infrastructure.adapters.out.persistence.postgres_alerta_repository import PostgresAlertaRepository
 from src.application.use_cases.recomendacion_use_case import RecomendacionUseCase
-from src.infrastructure.adapters.postgres_recomendacion_repository import PostgresRecomendacionRepository
+from src.infrastructure.adapters.out.persistence.postgres_recomendacion_repository import PostgresRecomendacionRepository
 from src.application.use_cases.experimento_use_case import ExperimentoUseCase
-from src.infrastructure.adapters.postgres_experimento_repository import PostgresExperimentoRepository
+from src.infrastructure.adapters.out.persistence.postgres_experimento_repository import PostgresExperimentoRepository
 from src.application.use_cases.etapa_use_case import EtapaUseCase
-from src.infrastructure.adapters.postgres_etapa_repository import PostgresEtapaRepository
+from src.infrastructure.adapters.out.persistence.postgres_etapa_repository import PostgresEtapaRepository
 from src.infrastructure.database import SessionLocal, SystemConfigDB
 
 router = APIRouter()
